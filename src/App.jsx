@@ -69,15 +69,34 @@ function App() {
     setPasswordStrength(strength);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
 
-    
     if (!captchaVerified) {
       alert("Please complete the CAPTCHA");
       return;
     }
-
+  
+    const recaptchaToken = grecaptcha.getResponse(); // Get reCAPTCHA response token
+  
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        recaptchaToken,
+      }),
+    });
+  
+    const data = await response.json();
+    if (data.success) {
+      alert('Login successful');
+    } else {
+      alert('Login failed: ' + data.error);
+    }
    
     console.log("Email:", email);
     console.log("Password:", password);
@@ -92,9 +111,9 @@ function App() {
       case 'Weak':
         return 'orange';
       case 'Fair':
-        return '#218838';
-      case 'Good':
         return 'lightgreen';
+      case 'Good':
+        return '#218838';
       case 'Strong':
         return 'green';
       case 'Moderate':
@@ -169,12 +188,12 @@ function App() {
           >
             
            {/* {passwordStrength ? `Your Password is ${passwordStrength}` : ''} */}
-           {passwordStrength !== '' ? `Your Password Strength is ${passwordStrength}` : ''}
+           {passwordStrength !== '' ? `Your Password is ${passwordStrength}` : ''}
           </div>
         </div>
         <div className="form-group">
           <ReCAPTCHA
-            sitekey="6LeZ4ioqAAAAAKrEWLwmVQ6sIMrsv36OuzrhvxNa"
+            sitekey="6LdA2ioqAAAAAPYQpm6b2YPZ_Arj1nHvI6TIMV1a"
             onChange={onCaptchaChange}
           />
         </div>
