@@ -1,7 +1,7 @@
 /* General styles for the entire app */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #e3edf1;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #5379f5c0, #ebedee);
   margin: 0;
   padding: 0;
   display: flex;
@@ -12,62 +12,68 @@ body {
 
 /* Registration container styles */
 .registration-container {
-  width: 100%;
-  max-width: 500px;
-  padding: 25px;
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
+  width: 60vw;
+  max-width: 469px;
+  padding: 20px;
+  background: linear-gradient(135deg, #fdfbfb, #ebedee);
+  border-radius: 15px;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
-  -webkit-border-radius: 10px;
-  -moz-border-radius: 10px;
-  -ms-border-radius: 10px;
-  -o-border-radius: 10px;
+  -webkit-border-radius: 15px;
 }
 
 /* Heading style */
 .registration-container h2 {
   text-align: center;
-  color: #333;
-  margin-bottom: 20px;
+  color: #4a4a4a;
+  margin-bottom: 25px;
+  font-weight: 700;
+  font-size: 24px;
 }
 
 /* Form group styles */
 .form-group {
-  margin-bottom: 15px;
-  position: relative; /* For positioning password toggle */
+  margin-bottom: 20px;
+  position: relative;
 }
 
 /* Label styles */
 .form-group label {
   display: block;
-  margin-bottom: 5px;
-  color: #555;
+  margin-bottom: 4px;
+  color: #6c757d;
+  font-weight: 500;
 }
 
 /* Input field styles */
 .form-group input {
   width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 12px;
+  border: 2px solid #ced4da;
+  border-radius: 6px;
   box-sizing: border-box;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: #80bdff;
+  outline: none;
 }
 
 /* Password input visibility toggle icon */
 .form-group .password-toggle {
   position: absolute;
-  right: 10px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   cursor: pointer;
-  color: #555;
+  color: #6c757d;
 }
 
 /* Password strength indicator styles */
 .password-strength {
-  margin-top: 5px;
-  font-size: 15px;
+  margin-top: 8px;
+  font-size: 14px;
   font-weight: bold;
 }
 
@@ -76,23 +82,27 @@ body {
   margin-top: 10px;
   display: flex;
   justify-content: center;
+  padding-left: 30px;
+  margin-left: 100px;
 }
 
 /* Submit button styles */
 button[type="submit"] {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   border: none;
-  border-radius: 4px;
-  background-color: #28a745;
+  border-radius: 6px;
+  background-color: #007bff;
   color: #fff;
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button[type="submit"]:hover {
-  background-color: #218838;
+  background-color: #0056b3;
+  transform: translateY(-2px);
 }
 
 button[type="submit"]:focus {
@@ -101,13 +111,13 @@ button[type="submit"]:focus {
 
 /* Error and success messages */
 .error-message {
-  color: red;
+  color: #dc3545;
   font-size: 14px;
   margin-top: 10px;
 }
 
 .success-message {
-  color: green;
+  color: #28a745;
   font-size: 14px;
   margin-top: 10px;
 }
