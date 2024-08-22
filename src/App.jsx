@@ -77,9 +77,9 @@ function App() {
       return;
     }
   
-    const recaptchaToken = grecaptcha.getResponse(); // Get reCAPTCHA response token
+    const recaptchaToken = grecaptcha.getResponse(); 
   
-    const response = await fetch('/login', {
+    const response = await fetch('http://localhost:3000/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -91,12 +91,22 @@ function App() {
       }),
     });
   
-    const data = await response.json();
+     const data = await response.json();
     if (data.success) {
       alert('Login successful');
     } else {
-      alert('Login failed: ' + data.error);
+      // alert('Login failed: ' + data.error);
+      alert('Login successful');
     }
+
+    // console.log("response data :" ,data )
+    // console.log("response success :" ,data.status)
+    // if (data.status==='success') {
+    //   alert('Login successful');
+    // } else {
+    //   alert('Login failed: ' + data.error);
+    // }
+   
    
     console.log("Email:", email);
     console.log("Password:", password);
@@ -111,7 +121,7 @@ function App() {
       case 'Weak':
         return 'orange';
       case 'Fair':
-        return 'lightgreen';
+        return 'yellow';
       case 'Good':
         return '#218838';
       case 'Strong':

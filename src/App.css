@@ -1,7 +1,7 @@
 /* General styles for the entire app */
 body {
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  background-color: #e3edf1;
   margin: 0;
   padding: 0;
   display: flex;
@@ -14,11 +14,15 @@ body {
 .registration-container {
   width: 100%;
   max-width: 500px;
-  padding: 20px;
+  padding: 25px;
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  -o-border-radius: 10px;
 }
 
 /* Heading style */
@@ -63,7 +67,8 @@ body {
 /* Password strength indicator styles */
 .password-strength {
   margin-top: 5px;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: bold;
 }
 
 /* CAPTCHA container style */
