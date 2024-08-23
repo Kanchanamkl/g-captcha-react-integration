@@ -141,8 +141,9 @@ function App() {
       <h2>Register</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>First Name</label>
+          {/* <label>First Name</label> */}
           <input 
+            placeholder="First Name"
             type="text" 
             value={firstName} 
             onChange={(e) => setFirstName(e.target.value)} 
@@ -150,8 +151,9 @@ function App() {
           />
         </div>
         <div className="form-group">
-          <label>Last Name</label>
+          {/* <label>Last Name</label> */}
           <input 
+            placeholder="Last Name"
             type="text" 
             value={lastName} 
             onChange={(e) => setLastName(e.target.value)} 
@@ -159,8 +161,9 @@ function App() {
           />
         </div>
         <div className="form-group">
-          <label>Email</label>
+          {/* <label>Email</label> */}
           <input 
+            placeholder="Email"
             type="email" 
             value={email} 
             onChange={(e) => setEmail(e.target.value)} 
@@ -168,9 +171,10 @@ function App() {
           />
         </div>
         <div className="form-group">
-          <label>Password</label>
+          {/* <label>Password</label> */}
           <div style={{ position: 'relative' }}>
             <input 
+              placeholder="Password"
               type={showPassword ? "text" : "password"} 
               value={password} 
               onChange={handlePasswordChange} 

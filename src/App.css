@@ -1,7 +1,7 @@
 /* General styles for the entire app */
 body {
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, #5379f5c0, #ebedee);
+  background: linear-gradient(135deg, rgba(21, 139, 250, 0.631), #ebedee);
   margin: 0;
   padding: 0;
   display: flex;
@@ -14,8 +14,8 @@ body {
 .registration-container {
   width: 60vw;
   max-width: 469px;
-  padding: 20px;
-  background: linear-gradient(135deg, #fdfbfb, #ebedee);
+  padding: 30px;
+  background: #fff;
   border-radius: 15px;
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
@@ -120,4 +120,36 @@ button[type="submit"]:focus {
   color: #28a745;
   font-size: 14px;
   margin-top: 10px;
+}
+
+
+
+
+
+
+/* for overide github.io default styles */
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  background-color: white; /* Ensures a white background */
+  color: black; /* Ensures black text */
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+input[type="text"]::placeholder,
+input[type="email"]::placeholder,
+input[type="password"]::placeholder {
+  color: #aaa; /* Placeholder text color */
+}
+
+/* Optional: Add hover/focus effects */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: #80bdff;
+  outline: none;
+  box-shadow: 0 0 5px rgba(128, 189, 255, 0.5);
 }
