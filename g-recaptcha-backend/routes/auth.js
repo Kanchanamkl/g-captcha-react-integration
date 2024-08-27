@@ -32,4 +32,9 @@ router.post('/login', async (req, res) => {
   }
 });
 
+
+router.get('/test', (req, res) => {
+  res.status(200).json({ message: 'Server is working properly' });
+});
+
 module.exports = router;
