@@ -1,7 +1,7 @@
 /* General styles for the entire app */
 body {
   font-family: 'Roboto', sans-serif;
-  background: linear-gradient(135deg, rgba(21, 139, 250, 0.631), #ebedee);
+  background: linear-gradient(135deg, rgba(2, 124, 238, 0.631), #ebedee);
   margin: 0;
   padding: 0;
   display: flex;
@@ -152,4 +152,17 @@ input[type="password"]:focus {
   border-color: #80bdff;
   outline: none;
   box-shadow: 0 0 5px rgba(128, 189, 255, 0.5);
+}
+
+
+.password-strength-bar-container {
+  width: 100%;
+  height: 5px;
+  background-color: #e0e0e0;
+  margin-top: 5px;
+}
+
+.password-strength-bar {
+  height: 100%;
+  transition: width 0.3s ease, background-color 0.3s ease;
 }
