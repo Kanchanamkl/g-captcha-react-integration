@@ -1,0 +1,114 @@
+/* General styles for the entire app */
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, rgba(2, 124, 238, 0.631), #ebedee);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Login container styles */
+.login-container {
+    width: 60vw;
+    max-width: 469px;
+    padding: 30px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    -webkit-border-radius: 15px;
+}
+
+/* Heading style */
+.login-container h2 {
+    text-align: center;
+    color: #4a4a4a;
+    margin-bottom: 25px;
+    font-weight: 700;
+    font-size: 24px;
+}
+
+/* Form group styles */
+.form-group {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+/* Label styles */
+.form-group label {
+    display: block;
+    margin-bottom: 4px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* Input field styles */
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ced4da;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #80bdff;
+    outline: none;
+}
+
+/* Password input visibility toggle icon */
+.form-group .password-toggle {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+}
+
+/* Submit button styles */
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background-color: #007bff;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+button[type="submit"]:focus {
+    outline: none;
+}
+
+/* Footer styles */
+.form-footer {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.form-footer p {
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.form-footer a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.form-footer a:hover {
+    text-decoration: underline;
+}

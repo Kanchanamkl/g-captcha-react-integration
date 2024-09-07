@@ -1,10 +1,60 @@
 const express = require('express');
-const axios = require('axios'); // Import axios for HTTP requests
+const axios = require('axios');
+const mongoose = require("mongoose");
 const router = express.Router();
+const UserModel = require('../models/User');
 
-router.post('/login', async (req, res) => {
-  const { email, password, recaptchaToken } = req.body;
 
+mongoose
+  .connect("mongodb://localhost:27017/secure-api-db", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connected to MongoDB successfully");
+  })
+  .catch((err) => {
+    console.error("Failed to connect to MongoDB", err);
+  });
+
+const users = [];
+
+router.get('/users', (req, res) => {
+  res.json(users);
+})
+
+router.post('/register', async (req, res) => {
+  const {firstName, lastName, email, password, recaptchaToken } = req.body;
+
+
+  const existingUser = await UserModel.findOne({ email });
+  if (existingUser) {
+    return res.status(400).json({ error: 'User already exists' });
+  }
+
+  const userId = users.length + 1;
+  users.push({
+    userId,
+    email,
+    password,
+    firstName,
+    lastName,
+    status: 'active',
+  })
+
+  const newUser = new UserModel({
+    userId,
+    firstName,
+    lastName,
+    email,
+    password,
+    status: 'active',
+  });
+
+  await newUser.save();
+
+
+  console.log('All users: ', users);
 
   const secretKey = process.env.RECAPTCHA_SECRET_KEY || '6LdA2ioqAAAAAFsbBtzHyFw3V-YhY-c0N42A_JUJ'; 
   const verificationURL = `https://www.google.com/recaptcha/api/siteverify`;
