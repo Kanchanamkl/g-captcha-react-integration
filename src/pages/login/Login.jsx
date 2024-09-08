@@ -14,9 +14,28 @@ const Login = () => {
     setPasswordVisible(!passwordVisible);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-     handleLogIn();
+
+    const { email, password } = e.target.elements;
+    const response = await fetch('http://localhost:3000/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        email: email.value,
+        password: password.value
+      })
+    });
+
+    const data = await response.json();
+    if (data.status === 'success') {
+      handleLogIn(email.value);
+    } else {
+      alert('Login failed: ' + data.error);
+    }
+
     
   };
 
@@ -53,6 +72,7 @@ const Login = () => {
         <button type="submit">Login</button>
         <div className="form-footer">
           <p>Don't have an account? <Link to={`../${APP_NAME}/register`}>Register here</Link></p>
+          <p>Fogot or expired your password? <Link to={`../${APP_NAME}/reset-password-req`}>Reset Now</Link></p>
         </div>
       </form>
     </div>

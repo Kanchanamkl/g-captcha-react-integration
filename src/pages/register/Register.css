@@ -9,17 +9,70 @@ body {
     align-items: center;
     height: 100vh;
   }
+
+  .register-page {
+    display: flex;
+    
+    align-items: center;
+    height: 100vh;
+  }
   
+
+  .signin-container {
+    position: relative;
+    left: 20%;
+    margin-left: 30px;
+    padding: 10px;
+    text-align: center;
+    background-color: #f1f1f1;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    animation: float 2s ease-in-out infinite;
+    -webkit-animation: float 2s ease-in-out infinite;
+}
+
+  @keyframes float {
+    0% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+    100% {
+      transform: translateY(0);
+    }
+  }
+
+  .signin-container  button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #218838;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .signin-container button:hover {
+    background-color: #1e7e34;
+  }
   /* Registration container styles */
   .registration-container {
+    position: relative;
+    right: -5%;
     width: 60vw;
     max-width: 469px;
     padding: 30px;
-    background: #fff;
+    background: #ffffffe5;
     border-radius: 15px;
     box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
     box-sizing: border-box;
     -webkit-border-radius: 15px;
+    margin-top: 47px;
+    padding-top: 5px
   }
   
   /* Heading style */
@@ -134,7 +187,7 @@ body {
   input[type="password"] {
     background-color: white; /* Ensures a white background */
     color: black; /* Ensures black text */
-    border: 1px solid #ccc;
+    border: 1px solid #0e0000;
     padding: 10px;
     border-radius: 4px;
   }
@@ -166,4 +219,5 @@ body {
     height: 100%;
     transition: width 0.3s ease, background-color 0.3s ease;
   }
+  
   

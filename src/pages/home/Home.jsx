@@ -7,7 +7,7 @@ const Home = () => {
 
   return (
     <div className="home-container">
-      <h1>Welcome to the Home {username}</h1>
+      <h1>Welcome  {username} !</h1>  
       <button className="logout-button" onClick={handleLogout}>Logout</button>
     </div>
   );

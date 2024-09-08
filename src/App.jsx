@@ -1,6 +1,8 @@
 import Register from './pages/register/Register';
 import Login from './pages/login/Login';
 import Home from './pages/home/Home';
+import ResetPasswordReq from './pages/reset_password_req/ResetPasswordReq';
+import ResetPassword from './pages/reset_password/ResetPassword';
 import { AuthContext } from './AuthContext';
 import React, { useState,useContext } from 'react';
 
@@ -15,6 +17,8 @@ function App() {
         <Routes>
           <Route path={`${APP_NAME}/register`} element ={<Register/>} />
           <Route path={`${APP_NAME}/login`} element ={<Login/>} />
+          <Route path={`${APP_NAME}/reset-password-req`} element ={<ResetPasswordReq/>} />
+          <Route path={`${APP_NAME}/reset-password`} element ={<ResetPassword/>} />
           <Route
             path={`${APP_NAME}/`}
             element={isLoggedIn ? <Home/> : <Login/>}
