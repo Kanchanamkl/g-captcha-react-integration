@@ -127,15 +127,38 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    //check if password contains personal informations(name or email)
+    const emailUsername = email.split("@")[0].toLowerCase();
+    const normalizedPassword = password.toLowerCase();
+
+    if (
+      normalizedPassword.includes(firstName.toLowerCase()) ||
+      normalizedPassword.includes(lastName.toLowerCase()) ||
+      normalizedPassword.includes(emailUsername)
+    ) {
+      alert(
+        "Password should not contain your personal information (name or email)"
+      );
+      return;
+    }
+
+
+
+    //check if password is common
+
     if (commonPasswords.includes(password)) {
       alert("This password is too common. Please choose a different one.");
       return;
     }
 
+    //check if password length is greater than 8
+
     if (password.length < 8) {
       alert("Password should be at least 8 characters long");
       return;
     }
+
+    //check if captcha is verified
     if (!captchaVerified) {
       alert("Please complete the CAPTCHA");
       return;
@@ -176,9 +199,8 @@ function Register() {
   };
 
   const handleSignInClick = () => {
-    navigate('../g-captcha-react-integration/login');
+    navigate("../g-captcha-react-integration/login");
   };
-
 
   return (
     <div className="register-page">
