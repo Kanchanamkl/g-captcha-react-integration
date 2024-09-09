@@ -6,7 +6,9 @@ const UserShema = new mongoose.Schema({
    email: String,
    password: String,
    status: String ,
-   passwordExpiryDate : Date
+   passwordExpiryDate : Date,
+   failedLoginAttempts : Number,
+   lockUntil : Date
 
 })
 

@@ -11,7 +11,8 @@ const JWT_SECRET =
   "4b6eebcd839bf6f7154f598f7f4397c799d15e06ad4c6b783f1d0f33e76a5b7edfe4b8b2f714f10b5c5dcbbbecc1f6d63271f8f15532f31a0b228756a5f3c2b0"; // Keep your secret safe and secure
 
 const PASSWORD_EXPIRATION_DAYS = 10;
-
+const MAX_FAILED_LOGIN_ATTEMPTS = 5;
+const LOCK_TIME_IN_MINUTES = 5;
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
@@ -83,11 +84,13 @@ router.post("/register", async (req, res) => {
       passwordExpiryDate: new Date(
         Date.now() + PASSWORD_EXPIRATION_DAYS * 24 * 60 * 60 * 1000
       ),
+      failedLoginAttempts: 0,
+      lockUntil: null,
     });
 
     await newUser.save();
 
-    res.status(200).json({ message: "Login successful", status: "success" });
+    res.status(200).json({ message: "Registration successful", status: "success" });
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }
@@ -102,9 +105,21 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
+        // check if user is locked
+
+    if (existingUser.lockUntil) {
+      const lockUntil = new Date(existingUser.lockUntil);
+      const timeLeft = (lockUntil - Date.now()) / 1000 / 60; // in minutes
+      if (lockUntil > new Date()) {
+        return res
+          .status(400)
+          .json({ error: `Your account is locked. Please try again in ${Math.ceil(timeLeft)} minutes.` });
+      }
+    }
+
+    // check if password has expired
     const today = new Date();
     const passwordExpireDate = new Date(existingUser.passwordExpiryDate);
-    // const passwordExpireDate = new Date(existingUser.passwordLastChanged.getTime() + PASSWORD_EXPIRATION_MINS * 60 * 1000);
 
     console.log("today ", today, "passwordExpireDate", passwordExpireDate);
     if (today > passwordExpireDate) {
@@ -113,13 +128,38 @@ router.post("/login", async (req, res) => {
         .json({ error: "Your password has expired. Please update it." });
     }
 
+
+    // check if password is correct
     const isPasswordValid = await bcrypt.compare(
       password,
       existingUser.password
     );
 
+    // check if user is locked
     if (!isPasswordValid) {
+      const failedLoginAttempts = existingUser.failedLoginAttempts + 1;
+      console.log("failedLoginAttempts", failedLoginAttempts);
+      if (failedLoginAttempts >= MAX_FAILED_LOGIN_ATTEMPTS) {
+        console.log("Account locked");
+        const lockUntil = new Date(Date.now() + LOCK_TIME_IN_MINUTES * 60 * 1000);
+        await UserModel.findByIdAndUpdate(existingUser._id, {
+          failedLoginAttempts: 0,
+          lockUntil: lockUntil,
+          status: "locked",
+        });
+      } else {
+        await UserModel.findByIdAndUpdate(existingUser._id, {
+          failedLoginAttempts: failedLoginAttempts,
+        });
+      }
       return res.status(400).json({ error: "Incorrect password" });
+    }else{
+
+      await UserModel.findByIdAndUpdate(existingUser._id, {
+        failedLoginAttempts: 0,
+        status: "active",
+        lockUntil: null,
+      });
     }
 
     res
@@ -133,7 +173,6 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ error: "Something went wrong" });
   }
 });
-
 router.post("/request-password-reset", async (req, res) => {
   const { email } = req.body;
 
