@@ -8,7 +8,12 @@ const UserShema = new mongoose.Schema({
    status: String ,
    passwordExpiryDate : Date,
    failedLoginAttempts : Number,
-   lockUntil : Date
+   lockUntil : Date,
+   passwordHistory: {
+      type: [String],  // Array to store hashed passwords
+      default: []
+    },// Array of previous passwords
+
 
 })
 

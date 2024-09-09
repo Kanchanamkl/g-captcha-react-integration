@@ -42,6 +42,7 @@ const ResetPassword = () => {
         newPassword,
       }),
       });
+      const data = await response.json();
       if (response.ok) {
 
         setNewPassword('');
@@ -50,7 +51,7 @@ const ResetPassword = () => {
         alert("Password reset successfully. Please login with your new password.");
         navigate("../g-captcha-react-integration/login")
       }else{
-        alert("Error resetting password. Please try again.");
+        alert(data.error);
       }
       
     } catch (err) {

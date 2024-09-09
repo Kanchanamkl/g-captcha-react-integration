@@ -1,0 +1,68 @@
+/* OTPVerification.css */
+.otp-verification-page {
+    display: flex;
+    height: 60%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .otp-verification-page h2 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .otp-verification-page form {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .otp-verification-page .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .otp-verification-page .form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .otp-verification-page .form-group input:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+  
+  .otp-verification-page .error-message {
+    color: #dc3545;
+    margin-top: 10px;
+    font-size: 0.875rem;
+  }
+  
+  .otp-verification-page button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .otp-verification-page button:hover {
+    background-color: #0056b3;
+  }
+  
+  .otp-verification-page button:focus {
+    outline: none;
+  }
+  

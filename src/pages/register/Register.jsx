@@ -195,7 +195,8 @@ function Register() {
     console.log("First Name:", firstName);
     console.log("Last Name:", lastName);
 
-    navigate("../g-captcha-react-integration/login");
+    navigate("../g-captcha-react-integration/otp-verification", { state: { email } });
+    //navigate("../g-captcha-react-integration/login");
   };
 
   const handleSignInClick = () => {

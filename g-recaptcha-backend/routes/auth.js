@@ -13,6 +13,8 @@ const JWT_SECRET =
 const PASSWORD_EXPIRATION_DAYS = 10;
 const MAX_FAILED_LOGIN_ATTEMPTS = 5;
 const LOCK_TIME_IN_MINUTES = 5;
+
+
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 465,
@@ -22,6 +24,7 @@ const transporter = nodemailer.createTransport({
     pass: "kfdjehrpjqvcjemc",
   },
 });
+
 
 mongoose
   .connect("mongodb://localhost:27017/secure-api-db", {
@@ -86,11 +89,14 @@ router.post("/register", async (req, res) => {
       ),
       failedLoginAttempts: 0,
       lockUntil: null,
+      passwordHistory: [hashedPassword] 
     });
 
     await newUser.save();
 
-    res.status(200).json({ message: "Registration successful", status: "success" });
+    res
+      .status(200)
+      .json({ message: "Registration successful", status: "success" });
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }
@@ -105,7 +111,7 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
-        // check if user is locked
+    // check if user is locked
 
     if (existingUser.lockUntil) {
       const lockUntil = new Date(existingUser.lockUntil);
@@ -113,7 +119,11 @@ router.post("/login", async (req, res) => {
       if (lockUntil > new Date()) {
         return res
           .status(400)
-          .json({ error: `Your account is locked. Please try again in ${Math.ceil(timeLeft)} minutes.` });
+          .json({
+            error: `Your account is locked. Please try again in ${Math.ceil(
+              timeLeft
+            )} minutes.`,
+          });
       }
     }
 
@@ -128,7 +138,6 @@ router.post("/login", async (req, res) => {
         .json({ error: "Your password has expired. Please update it." });
     }
 
-
     // check if password is correct
     const isPasswordValid = await bcrypt.compare(
       password,
@@ -141,7 +150,9 @@ router.post("/login", async (req, res) => {
       console.log("failedLoginAttempts", failedLoginAttempts);
       if (failedLoginAttempts >= MAX_FAILED_LOGIN_ATTEMPTS) {
         console.log("Account locked");
-        const lockUntil = new Date(Date.now() + LOCK_TIME_IN_MINUTES * 60 * 1000);
+        const lockUntil = new Date(
+          Date.now() + LOCK_TIME_IN_MINUTES * 60 * 1000
+        );
         await UserModel.findByIdAndUpdate(existingUser._id, {
           failedLoginAttempts: 0,
           lockUntil: lockUntil,
@@ -153,8 +164,7 @@ router.post("/login", async (req, res) => {
         });
       }
       return res.status(400).json({ error: "Incorrect password" });
-    }else{
-
+    } else {
       await UserModel.findByIdAndUpdate(existingUser._id, {
         failedLoginAttempts: 0,
         status: "active",
@@ -162,22 +172,23 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Login successful",
-        status: "success",
-        user: existingUser,
-      });
+    res.status(200).json({
+      message: "Login successful",
+      status: "success",
+      user: existingUser,
+    });
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }
 });
+
+
+
 router.post("/request-password-reset", async (req, res) => {
   const { email } = req.body;
 
   try {
-    const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({ email }); 
     if (!user) {
       return res
         .status(400)
@@ -187,6 +198,8 @@ router.post("/request-password-reset", async (req, res) => {
     const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
 
     const resetURL = `http://localhost:5173/g-captcha-react-integration/reset-password?token=${resetToken}`;
+
+
     const mailOptions = {
       from: process.env.EMAIL_USER,
       to: email,
@@ -219,10 +232,25 @@ router.post("/reset-password", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
+
+
+    //check is contains hashedPassword in passwordHistory array by bcript compare
+    if (user.passwordHistory.some((password) =>
+        bcrypt.compareSync(newPassword, password)
+      )
+    ) {
+      console.log("This Password already used");
+      return res.status(400).json({ error: "Password already used" });
+    }
+
+    // add new passoword also to password hsistory array
+    user.passwordHistory.push(hashedPassword);
+
+
     user.password = hashedPassword;
     await user.save();
 
-    res.status(200).json({ message: "Password reset successful" });
+    res.status(200).json({ message: "Password reset successfully. Please login with your new password." });
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       return res.status(400).json({ error: "Token has expired" });

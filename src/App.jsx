@@ -3,6 +3,7 @@ import Login from './pages/login/Login';
 import Home from './pages/home/Home';
 import ResetPasswordReq from './pages/reset_password_req/ResetPasswordReq';
 import ResetPassword from './pages/reset_password/ResetPassword';
+import OTPVerification from './pages/otp/OTPVerification';
 import { AuthContext } from './AuthContext';
 import React, { useState,useContext } from 'react';
 
@@ -19,6 +20,8 @@ function App() {
           <Route path={`${APP_NAME}/login`} element ={<Login/>} />
           <Route path={`${APP_NAME}/reset-password-req`} element ={<ResetPasswordReq/>} />
           <Route path={`${APP_NAME}/reset-password`} element ={<ResetPassword/>} />
+          <Route path={`${APP_NAME}/otp-verification`} element ={<OTPVerification/>} />
+
           <Route
             path={`${APP_NAME}/`}
             element={isLoggedIn ? <Home/> : <Login/>}
