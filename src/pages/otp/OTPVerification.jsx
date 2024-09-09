@@ -21,10 +21,11 @@ function OTPVerification() {
     const data = await response.json();
 
     if (data.status === "success") {
-      alert("Successfully verified!");
+      alert(data.message);
       navigate("../g-captcha-react-integration/login");
     } else {
-      setError(data.error || "Verification failed");
+      alert(data.error);
+      return;
     }
   };
 

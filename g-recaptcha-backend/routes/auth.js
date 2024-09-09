@@ -6,6 +6,7 @@ const router = express.Router();
 const UserModel = require("../models/User");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
+const crypto = require("crypto");
 const JWT_SECRET =
   process.env.JWT_SECRET ||
   "4b6eebcd839bf6f7154f598f7f4397c799d15e06ad4c6b783f1d0f33e76a5b7edfe4b8b2f714f10b5c5dcbbbecc1f6d63271f8f15532f31a0b228756a5f3c2b0"; // Keep your secret safe and secure
@@ -13,7 +14,7 @@ const JWT_SECRET =
 const PASSWORD_EXPIRATION_DAYS = 10;
 const MAX_FAILED_LOGIN_ATTEMPTS = 5;
 const LOCK_TIME_IN_MINUTES = 5;
-
+let otpStorage = {};
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -24,7 +25,6 @@ const transporter = nodemailer.createTransport({
     pass: "kfdjehrpjqvcjemc",
   },
 });
-
 
 mongoose
   .connect("mongodb://localhost:27017/secure-api-db", {
@@ -73,6 +73,25 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ error: "User already exists" });
     }
 
+    // Generate OTP
+
+    const otp = crypto.randomInt(100000, 999999).toString();
+    console.log("otp", otp);
+
+    // Store OTP
+    otpStorage[email] = otp;
+
+    // Send OTP email
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Your OTP Code",
+      text: `Your OTP code is ${otp}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ status: "success", message: "OTP sent to email" });
+
     //salt and hashing
     const salt = await bcrypt.genSalt(10);
     console.log("salt", salt);
@@ -83,20 +102,20 @@ router.post("/register", async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
-      status: "active",
+      status: "deactive",
       passwordExpiryDate: new Date(
         Date.now() + PASSWORD_EXPIRATION_DAYS * 24 * 60 * 60 * 1000
       ),
       failedLoginAttempts: 0,
       lockUntil: null,
-      passwordHistory: [hashedPassword] 
+      passwordHistory: [hashedPassword],
     });
 
     await newUser.save();
 
-    res
-      .status(200)
-      .json({ message: "Registration successful", status: "success" });
+    // res
+    //   .status(200)
+    //   .json({ message: "Registration successful", status: "success" });
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }
@@ -111,19 +130,22 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid email or password" });
     }
 
+    // if (existingUser.status !== "active") {
+    //   return res.status(400).json({ error: "Your account is not active" });
+    // }
+    
+
     // check if user is locked
 
     if (existingUser.lockUntil) {
       const lockUntil = new Date(existingUser.lockUntil);
       const timeLeft = (lockUntil - Date.now()) / 1000 / 60; // in minutes
       if (lockUntil > new Date()) {
-        return res
-          .status(400)
-          .json({
-            error: `Your account is locked. Please try again in ${Math.ceil(
-              timeLeft
-            )} minutes.`,
-          });
+        return res.status(400).json({
+          error: `Your account is locked. Please try again in ${Math.ceil(
+            timeLeft
+          )} minutes.`,
+        });
       }
     }
 
@@ -182,13 +204,11 @@ router.post("/login", async (req, res) => {
   }
 });
 
-
-
 router.post("/request-password-reset", async (req, res) => {
   const { email } = req.body;
 
   try {
-    const user = await UserModel.findOne({ email }); 
+    const user = await UserModel.findOne({ email });
     if (!user) {
       return res
         .status(400)
@@ -198,7 +218,6 @@ router.post("/request-password-reset", async (req, res) => {
     const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
 
     const resetURL = `http://localhost:5173/g-captcha-react-integration/reset-password?token=${resetToken}`;
-
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -232,10 +251,9 @@ router.post("/reset-password", async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
-
-
-    //check is contains hashedPassword in passwordHistory array by bcript compare
-    if (user.passwordHistory.some((password) =>
+    //check weather contains hashedPassword in passwordHistory array by bcript compare
+    if (
+      user.passwordHistory.some((password) =>
         bcrypt.compareSync(newPassword, password)
       )
     ) {
@@ -246,16 +264,40 @@ router.post("/reset-password", async (req, res) => {
     // add new passoword also to password hsistory array
     user.passwordHistory.push(hashedPassword);
 
-
     user.password = hashedPassword;
     await user.save();
 
-    res.status(200).json({ message: "Password reset successfully. Please login with your new password." });
+    res.status(200).json({
+      message:
+        "Password reset successfully. Please login with your new password.",
+    });
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       return res.status(400).json({ error: "Token has expired" });
     }
     res.status(400).json({ error: "Invalid or expired token" });
+  }
+});
+
+
+router.post("/verify-otp", async (req, res) => {
+  const { email, otp } = req.body;
+
+  console.log("otpStorage", otpStorage);
+  const existingUser = await UserModel.findOne({ email });
+
+  // Verify OTP
+  if (otpStorage[email] === otp) {
+    // OTP verified successfully
+    delete otpStorage[email]; // Clear OTP after verification
+    await UserModel.findByIdAndUpdate(existingUser._id, {
+      status: "active",
+    });
+   
+    res.status(200).json({ status: 'success', message: 'OTP verified successfully' });
+  } else {
+    // OTP verification failed
+    res.status(400).json({ status: 'error', error: 'Invalid OTP' });
   }
 });
 

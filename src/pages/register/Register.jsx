@@ -14,6 +14,7 @@ function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [commonPasswords, setCommonPasswords] = useState([]);
   const [passwordError, setPasswordError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -126,77 +127,85 @@ function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
+    try {
+      //check if password contains personal informations(name or email)
+      const emailUsername = email.split("@")[0].toLowerCase();
+      const normalizedPassword = password.toLowerCase();
 
-    //check if password contains personal informations(name or email)
-    const emailUsername = email.split("@")[0].toLowerCase();
-    const normalizedPassword = password.toLowerCase();
+      if (
+        normalizedPassword.includes(firstName.toLowerCase()) ||
+        normalizedPassword.includes(lastName.toLowerCase()) ||
+        normalizedPassword.includes(emailUsername)
+      ) {
+        alert(
+          "Password should not contain your personal information (name or email)"
+        );
+        return;
+      }
 
-    if (
-      normalizedPassword.includes(firstName.toLowerCase()) ||
-      normalizedPassword.includes(lastName.toLowerCase()) ||
-      normalizedPassword.includes(emailUsername)
-    ) {
-      alert(
-        "Password should not contain your personal information (name or email)"
-      );
-      return;
+      //check if password is common
+
+      if (commonPasswords.includes(password)) {
+        alert("This password is too common. Please choose a different one.");
+        return;
+      }
+
+      //check if password length is greater than 8
+
+      if (password.length < 8) {
+        alert("Password should be at least 8 characters long");
+        return;
+      }
+
+      //check if captcha is verified
+      if (!captchaVerified) {
+        alert("Please complete the CAPTCHA");
+        return;
+      }
+
+      const recaptchaToken = grecaptcha.getResponse();
+
+      const response = await fetch("http://localhost:3000/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+          recaptchaToken,
+        }),
+      });
+
+      const data = await response.json();
+
+      console.log("response data :", data);
+      console.log("response success :", data.status);
+      if (data.status === "success") {
+        alert(data.message);
+        navigate("../g-captcha-react-integration/otp-verification", {
+          state: { email },
+        });
+      } else {
+        alert("Login failed: " + data.error);
+        return;
+      }
+
+      console.log("Email:", email);
+      console.log("Password:", password);
+      console.log("First Name:", firstName);
+      console.log("Last Name:", lastName);
+
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error:", error);
+      alert("Something went wrong. Please try again later.");
+    } finally {
+      setIsLoading(false); // Stop loading once request finishes
     }
-
-
-
-    //check if password is common
-
-    if (commonPasswords.includes(password)) {
-      alert("This password is too common. Please choose a different one.");
-      return;
-    }
-
-    //check if password length is greater than 8
-
-    if (password.length < 8) {
-      alert("Password should be at least 8 characters long");
-      return;
-    }
-
-    //check if captcha is verified
-    if (!captchaVerified) {
-      alert("Please complete the CAPTCHA");
-      return;
-    }
-
-    const recaptchaToken = grecaptcha.getResponse();
-
-    const response = await fetch("http://localhost:3000/auth/register", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        firstName,
-        lastName,
-        email,
-        password,
-        recaptchaToken,
-      }),
-    });
-
-    const data = await response.json();
-
-    console.log("response data :", data);
-    console.log("response success :", data.status);
-    if (data.status === "success") {
-      alert(data.message);
-    } else {
-      alert("Login failed: " + data.error);
-    }
-
-    console.log("Email:", email);
-    console.log("Password:", password);
-    console.log("First Name:", firstName);
-    console.log("Last Name:", lastName);
-
-    navigate("../g-captcha-react-integration/otp-verification", { state: { email } });
-    //navigate("../g-captcha-react-integration/login");
   };
 
   const handleSignInClick = () => {
@@ -204,93 +213,103 @@ function Register() {
   };
 
   return (
-    <div className="register-page">
-      <div className="registration-container">
-        <h2>Register</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <input
-              placeholder="First Name"
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <input
-              placeholder="Last Name"
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <input
-              placeholder="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <div style={{ position: "relative" }}>
+    <>
+      <div className="register-page">
+        <div className="registration-container">
+          <h2>Register</h2>
+          <form onSubmit={handleSubmit}>
+            <div className="form-group">
               <input
-                placeholder="Password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={handlePasswordChange}
+                placeholder="First Name"
+                type="text"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
                 required
-                style={{ paddingRight: "40px" }}
               />
-              <span
-                onClick={togglePasswordVisibility}
-                style={{
-                  position: "absolute",
-                  right: "10px",
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  cursor: "pointer",
-                }}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </span>
             </div>
+            <div className="form-group">
+              <input
+                placeholder="Last Name"
+                type="text"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <input
+                placeholder="Email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <div style={{ position: "relative" }}>
+                <input
+                  placeholder="Password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={handlePasswordChange}
+                  required
+                  style={{ paddingRight: "40px" }}
+                />
+                <span
+                  onClick={togglePasswordVisibility}
+                  style={{
+                    position: "absolute",
+                    right: "10px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    cursor: "pointer",
+                  }}
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
 
-            <div className="password-strength-bar-container">
+              <div className="password-strength-bar-container">
+                <div
+                  className="password-strength-bar"
+                  style={{
+                    width: getPasswordStrengthWidth(),
+                    backgroundColor: getPasswordStrengthColor(),
+                  }}
+                />
+              </div>
               <div
-                className="password-strength-bar"
-                style={{
-                  width: getPasswordStrengthWidth(),
-                  backgroundColor: getPasswordStrengthColor(),
-                }}
+                className="password-strength"
+                style={{ color: getPasswordStrengthColor() }}
+              >
+                {passwordStrength ? `Your Password is ${passwordStrength}` : ""}
+              </div>
+            </div>
+            <div className="form-group">
+              <ReCAPTCHA
+                sitekey="6LdA2ioqAAAAAPYQpm6b2YPZ_Arj1nHvI6TIMV1a"
+                onChange={onCaptchaChange}
               />
             </div>
-            <div
-              className="password-strength"
-              style={{ color: getPasswordStrengthColor() }}
-            >
-              {passwordStrength ? `Your Password is ${passwordStrength}` : ""}
-            </div>
-          </div>
-          <div className="form-group">
-            <ReCAPTCHA
-              sitekey="6LdA2ioqAAAAAPYQpm6b2YPZ_Arj1nHvI6TIMV1a"
-              onChange={onCaptchaChange}
-            />
-          </div>
-          <button type="submit">Register</button>
-        </form>
+            <button type="submit">Register</button>
+          </form>
+        </div>
+
+        <div className="signin-container">
+          <h2>Already have an account?</h2>
+          <p>If you already have an account, sign in here!</p>
+          <button onClick={handleSignInClick}>Sign In</button>
+        </div>
       </div>
 
-      <div className="signin-container">
-        <h2>Already have an account?</h2>
-        <p>If you already have an account, sign in here!</p>
-        <button onClick={handleSignInClick}>Sign In</button>
-      </div>
-    </div>
+      {isLoading && (
+        <div className="loading-spinner">
+          {/* Add your spinner animation here */}
+          <div className="spinner"></div>
+          <p></p>
+        </div>
+      )}
+    </>
   );
 }
 
