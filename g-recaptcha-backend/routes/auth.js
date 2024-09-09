@@ -1,12 +1,26 @@
-const express = require('express');
-const axios = require('axios');
+const express = require("express");
+const axios = require("axios");
 const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 const router = express.Router();
-const UserModel = require('../models/User');
+const UserModel = require("../models/User");
+const jwt = require("jsonwebtoken");
+const nodemailer = require("nodemailer");
+const JWT_SECRET =
+  process.env.JWT_SECRET ||
+  "4b6eebcd839bf6f7154f598f7f4397c799d15e06ad4c6b783f1d0f33e76a5b7edfe4b8b2f714f10b5c5dcbbbecc1f6d63271f8f15532f31a0b228756a5f3c2b0"; // Keep your secret safe and secure
 
 const PASSWORD_EXPIRATION_DAYS = 10;
 
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: "madhuranga829@gmail.com",
+    pass: "kfdjehrpjqvcjemc",
+  },
+});
 
 mongoose
   .connect("mongodb://localhost:27017/secure-api-db", {
@@ -20,19 +34,19 @@ mongoose
     console.error("Failed to connect to MongoDB", err);
   });
 
-
-router.get('/users', (req, res) => {
+router.get("/users", (req, res) => {
   UserModel.find().then((users) => res.json(users));
-})
+});
 
-router.post('/register', async (req, res) => {
-  const {firstName, lastName, email, password, recaptchaToken } = req.body;
+router.post("/register", async (req, res) => {
+  const { firstName, lastName, email, password, recaptchaToken } = req.body;
 
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY || '6LdA2ioqAAAAAFsbBtzHyFw3V-YhY-c0N42A_JUJ'; 
+  const secretKey =
+    process.env.RECAPTCHA_SECRET_KEY ||
+    "6LdA2ioqAAAAAFsbBtzHyFw3V-YhY-c0N42A_JUJ";
   const verificationURL = `https://www.google.com/recaptcha/api/siteverify`;
 
   try {
-    // captcha verification
     const response = await axios.post(verificationURL, null, {
       params: {
         secret: secretKey,
@@ -43,79 +57,139 @@ router.post('/register', async (req, res) => {
     const data = response.data;
 
     if (!data.success) {
-      return res.status(400).json({ error: 'reCAPTCHA verification failed' });
+      return res.status(400).json({ error: "reCAPTCHA verification failed" });
     }
 
-   
-    console.log('reCAPTCHA verified successfully');
-
+    console.log("reCAPTCHA verified successfully");
 
     // insert user into database
 
-    const existingUser = await UserModel.findOne({email});
+    const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ error: 'User already exists' });
+      return res.status(400).json({ error: "User already exists" });
     }
-
 
     //salt and hashing
     const salt = await bcrypt.genSalt(10);
-    console.log("salt", salt); 
+    console.log("salt", salt);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = new UserModel({
       firstName,
       lastName,
       email,
-      password : hashedPassword,
-      status: 'active',
-      passwordExpiryDate: new Date(Date.now() + PASSWORD_EXPIRATION_DAYS * 24 * 60 * 60 * 1000),
+      password: hashedPassword,
+      status: "active",
+      passwordExpiryDate: new Date(
+        Date.now() + PASSWORD_EXPIRATION_DAYS * 24 * 60 * 60 * 1000
+      ),
     });
-  
+
     await newUser.save();
 
-    res.status(200).json({ message: 'Login successful' , status: 'success'});
+    res.status(200).json({ message: "Login successful", status: "success" });
   } catch (error) {
-    res.status(500).json({ error: 'Something went wrong' });
+    res.status(500).json({ error: "Something went wrong" });
   }
 });
 
-
-router.post('/login', async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
-
-    const existingUser = await UserModel.findOne({email});
+    const existingUser = await UserModel.findOne({ email });
 
     if (!existingUser) {
-      return res.status(400).json({ error: 'Invalid email or password' });
+      return res.status(400).json({ error: "Invalid email or password" });
     }
-
 
     const today = new Date();
     const passwordExpireDate = new Date(existingUser.passwordExpiryDate);
     // const passwordExpireDate = new Date(existingUser.passwordLastChanged.getTime() + PASSWORD_EXPIRATION_MINS * 60 * 1000);
 
-    console.log('today ',today,"passwordExpireDate", passwordExpireDate);
+    console.log("today ", today, "passwordExpireDate", passwordExpireDate);
     if (today > passwordExpireDate) {
-      return res.status(400).json({ error: 'Your password has expired. Please update it.' });
+      return res
+        .status(400)
+        .json({ error: "Your password has expired. Please update it." });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, existingUser.password);
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      existingUser.password
+    );
 
     if (!isPasswordValid) {
-      return res.status(400).json({ error: 'Incorrect password' });
+      return res.status(400).json({ error: "Incorrect password" });
     }
 
-    res.status(200).json({ message: 'Login successful' , status: 'success', user: existingUser});
+    res
+      .status(200)
+      .json({
+        message: "Login successful",
+        status: "success",
+        user: existingUser,
+      });
   } catch (error) {
-    res.status(500).json({ error: 'Something went wrong' });
+    res.status(500).json({ error: "Something went wrong" });
   }
 });
 
+router.post("/request-password-reset", async (req, res) => {
+  const { email } = req.body;
 
-router.get('/test', (req, res) => {
-  res.status(200).json({ message: 'Server is working ' });
+  try {
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ error: "User with this email does not exist" });
+    }
+
+    const resetToken = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
+
+    const resetURL = `http://localhost:5173/g-captcha-react-integration/reset-password?token=${resetToken}`;
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset Request",
+      text: `You requested a password reset. Click the link below to reset your password: \n\n${resetURL}\n\nThis link will expire in 1 hour.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.status(200).json({ message: "Password reset link sent to your email" });
+  } catch (error) {
+    useNewUrlParser;
+    console.error(error);
+    res.status(500).json({ error: "Failed to send password reset email" });
+  }
+});
+
+router.post("/reset-password", async (req, res) => {
+  const { token, newPassword } = req.body;
+  console.log("token", token, "newPassword", newPassword);
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const { email } = decoded;
+    console.log("email", email);
+
+    const user = await UserModel.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "User not found for this email!" });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({ message: "Password reset successful" });
+  } catch (error) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(400).json({ error: "Token has expired" });
+    }
+    res.status(400).json({ error: "Invalid or expired token" });
+  }
 });
 
 module.exports = router;
