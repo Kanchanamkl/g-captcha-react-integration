@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import "./OTPVerification.css"; // Import the stylesheet
+import "./OTPVerification.css"; 
 
 function OTPVerification() {
   const [otp, setOtp] = useState("");

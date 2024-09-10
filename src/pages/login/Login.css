@@ -1,4 +1,4 @@
-/* General styles for the entire app */
+
 body {
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(135deg, rgba(2, 124, 238, 0.631), #ebedee);
@@ -10,7 +10,7 @@ body {
     height: 100vh;
 }
 
-/* Login container styles */
+
 .login-container {
     width: 60vw;
     max-width: 469px;
@@ -22,7 +22,7 @@ body {
     -webkit-border-radius: 15px;
 }
 
-/* Heading style */
+
 .login-container h2 {
     text-align: center;
     color: #4a4a4a;
@@ -31,13 +31,13 @@ body {
     font-size: 24px;
 }
 
-/* Form group styles */
+
 .form-group {
     margin-bottom: 20px;
     position: relative;
 }
 
-/* Label styles */
+
 .form-group label {
     display: block;
     margin-bottom: 4px;
@@ -45,7 +45,7 @@ body {
     font-weight: 500;
 }
 
-/* Input field styles */
+
 .form-group input {
     width: 100%;
     padding: 12px;
@@ -60,7 +60,7 @@ body {
     outline: none;
 }
 
-/* Password input visibility toggle icon */
+
 .form-group .password-toggle {
     position: absolute;
     right: 12px;
@@ -70,7 +70,7 @@ body {
     color: #6c757d;
 }
 
-/* Submit button styles */
+
 button[type="submit"] {
     width: 100%;
     padding: 12px;
@@ -93,7 +93,7 @@ button[type="submit"]:focus {
     outline: none;
 }
 
-/* Footer styles */
+
 .form-footer {
     text-align: center;
     margin-top: 15px;

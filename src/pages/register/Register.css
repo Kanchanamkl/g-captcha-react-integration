@@ -1,4 +1,4 @@
-/* General styles for the entire app */
+
 body {
     font-family: 'Roboto', sans-serif;
     background: linear-gradient(135deg, rgba(2, 124, 238, 0.631), #ebedee);
@@ -59,7 +59,7 @@ body {
   .signin-container button:hover {
     background-color: #1e7e34;
   }
-  /* Registration container styles */
+
   .registration-container {
     position: relative;
     right: -5%;
@@ -75,7 +75,7 @@ body {
     padding-top: 5px
   }
   
-  /* Heading style */
+
   .registration-container h2 {
     text-align: center;
     color: #4a4a4a;
@@ -84,21 +84,20 @@ body {
     font-size: 24px;
   }
   
-  /* Form group styles */
+
   .form-group {
     margin-bottom: 20px;
     position: relative;
   }
   
-  /* Label styles */
+
   .form-group label {
     display: block;
     margin-bottom: 4px;
     color: #6c757d;
     font-weight: 500;
   }
-  
-  /* Input field styles */
+
   .form-group input {
     width: 100%;
     padding: 12px;
@@ -113,7 +112,7 @@ body {
     outline: none;
   }
   
-  /* Password input visibility toggle icon */
+
   .form-group .password-toggle {
     position: absolute;
     right: 12px;
@@ -123,14 +122,14 @@ body {
     color: #6c757d;
   }
   
-  /* Password strength indicator styles */
+
   .password-strength {
     margin-top: 8px;
     font-size: 14px;
     font-weight: bold;
   }
   
-  /* CAPTCHA container style */
+
   .form-group .recaptcha-container {
     margin-top: 10px;
     display: flex;
@@ -139,7 +138,7 @@ body {
     margin-left: 100px;
   }
   
-  /* Submit button styles */
+
   button[type="submit"] {
     width: 100%;
     padding: 12px;
@@ -162,7 +161,7 @@ body {
     outline: none;
   }
   
-  /* Error and success messages */
+
   .error-message {
     color: #dc3545;
     font-size: 14px;
@@ -180,13 +179,13 @@ body {
   
   
   
-  /* for overide github.io default styles */
+
   
   input[type="text"],
   input[type="email"],
   input[type="password"] {
-    background-color: white; /* Ensures a white background */
-    color: black; /* Ensures black text */
+    background-color: white;
+    color: black;
     border: 1px solid #0e0000;
     padding: 10px;
     border-radius: 4px;
@@ -195,10 +194,10 @@ body {
   input[type="text"]::placeholder,
   input[type="email"]::placeholder,
   input[type="password"]::placeholder {
-    color: #aaa; /* Placeholder text color */
+    color: #aaa; 
   }
   
-  /* Optional: Add hover/focus effects */
+
   input[type="text"]:focus,
   input[type="email"]:focus,
   input[type="password"]:focus {
